@@ -12,7 +12,7 @@ import { logDebug } from 'src/app/utils/log';
  * @param href
  * @param target
  */
-export function openLink(href: string, target = '_self'): void {
+export function openLink (href: string, target = '_self'): void {
     logDebug('openLink', href, target);
     window.open(href, target, 'noopener noreferrer');
 }
@@ -21,7 +21,7 @@ export function openLink(href: string, target = '_self'): void {
  * Opens a link in a new tab.
  * @param href
  */
-export function openLinkBlank(href: string): void {
+export function openLinkBlank (href: string): void {
     openLink(href, '_blank');
 }
 
@@ -31,7 +31,7 @@ export function openLinkBlank(href: string): void {
  * @param href
  * @param fallback
  */
-export function openDeeplinkWithFallback(href: string, fallback: () => void): void {
+export function openDeeplinkWithFallback (href: string, fallback: () => void): void {
     const doFallback = (): void => {
         if (isBrowser('safari') || (isOS('android') && isBrowser('firefox'))) {
             // Safari does not support fallback to direct link.
@@ -46,7 +46,7 @@ export function openDeeplinkWithFallback(href: string, fallback: () => void): vo
     openLink(href, '_self');
 }
 
-export function getSystemTheme(): THEME {
+export function getSystemTheme (): THEME {
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
         return THEME.LIGHT;
     }
@@ -54,7 +54,7 @@ export function getSystemTheme(): THEME {
     return THEME.DARK;
 }
 
-export function subscribeToThemeChange(callback: (theme: THEME) => void): () => void {
+export function subscribeToThemeChange (callback: (theme: THEME) => void): () => void {
     const handler = (event: MediaQueryListEvent): void =>
         callback(event.matches ? THEME.DARK : THEME.LIGHT);
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', handler);
@@ -62,7 +62,7 @@ export function subscribeToThemeChange(callback: (theme: THEME) => void): () => 
         window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', handler);
 }
 
-export function disableScroll(): void {
+export function disableScroll (): void {
     if (document.documentElement.scrollHeight === document.documentElement.clientHeight) {
         return;
     }
@@ -71,20 +71,22 @@ export function disableScroll(): void {
     document.body.classList.add(disableScrollClass);
 }
 
-export function enableScroll(): void {
+export function enableScroll (): void {
     document.body.classList.remove(disableScrollClass);
     document.documentElement.scrollTo({ top: -parseFloat(getComputedStyle(document.body).top) });
     document.body.style.top = 'auto';
 }
 
-export function fixMobileSafariActiveTransition(): void {
+export function fixMobileSafariActiveTransition (): void {
     if (!document.body.hasAttribute('ontouchstart')) {
         document.body.setAttribute('ontouchstart', '');
     }
 }
 
-export function defineStylesRoot(): void {
-    customElements.define(globalStylesTag, class TcRootElement extends HTMLElement {});
+export function defineStylesRoot (): void {
+    if (!customElements.get(globalStylesTag)) {
+        customElements.define(globalStylesTag, class TcRootElement extends HTMLElement {});
+    }
 }
 
 /**
@@ -92,7 +94,7 @@ export function defineStylesRoot(): void {
  * such as asynchronous operations from other developers and browser APIs, are executed before.
  * @param callback
  */
-export async function createMacrotask(callback: () => void): Promise<void> {
+export async function createMacrotask (callback: () => void): Promise<void> {
     await new Promise(resolve => requestAnimationFrame(resolve));
     callback();
 }
@@ -102,7 +104,7 @@ export async function createMacrotask(callback: () => void): Promise<void> {
  * such as asynchronous operations from other developers and browser APIs, are executed before.
  * @param callback
  */
-export async function createMacrotaskAsync<T>(callback: () => Promise<T>): Promise<T> {
+export async function createMacrotaskAsync<T> (callback: () => Promise<T>): Promise<T> {
     await new Promise(resolve => requestAnimationFrame(resolve));
     return callback();
 }
@@ -110,7 +112,7 @@ export async function createMacrotaskAsync<T>(callback: () => Promise<T>): Promi
 /**
  * Preload images after page load to improve UX and Web Vitals metrics without affecting initial page load performance.
  */
-export function preloadImages(images: string[]): void {
+export function preloadImages (images: string[]): void {
     if (document.readyState !== 'complete') {
         window.addEventListener('load', () => createMacrotask(() => preloadImages(images)), {
             once: true
@@ -123,7 +125,7 @@ export function preloadImages(images: string[]): void {
     }
 }
 
-export function getWindow(): Window | undefined {
+export function getWindow (): Window | undefined {
     if (typeof window !== 'undefined') {
         return window;
     }
@@ -134,7 +136,7 @@ export function getWindow(): Window | undefined {
 /**
  * Returns `localStorage` if it is available. In Safari's private mode, it returns `InMemoryStorage`. In Node.js, it throws an error.
  */
-export function tryGetLocalStorage(): Storage {
+export function tryGetLocalStorage (): Storage {
     if (isLocalStorageAvailable()) {
         return localStorage;
     }
@@ -151,7 +153,7 @@ export function tryGetLocalStorage(): Storage {
 /**
  * Checks if `localStorage` is available.
  */
-function isLocalStorageAvailable(): boolean {
+function isLocalStorageAvailable (): boolean {
     // We use a try/catch block because Safari's private mode throws an error when attempting to access localStorage.
     try {
         return typeof localStorage !== 'undefined';
@@ -163,13 +165,13 @@ function isLocalStorageAvailable(): boolean {
 /**
  * Checks if the environment is Node.js.
  */
-function isNodeJs(): boolean {
+function isNodeJs (): boolean {
     return (
         typeof process !== 'undefined' && process.versions != null && process.versions.node != null
     );
 }
 
-export function isMobileUserAgent(): boolean {
+export function isMobileUserAgent (): boolean {
     let check = false;
     (function (a) {
         if (
@@ -193,7 +195,7 @@ export function isMobileUserAgent(): boolean {
     return check;
 }
 
-export function getUserAgent(): UserAgent {
+export function getUserAgent (): UserAgent {
     const results = new UAParser().getResult();
     const osName = results.os.name?.toLowerCase();
     const deviceModel = results.device.model?.toLowerCase();
@@ -242,11 +244,11 @@ export function getUserAgent(): UserAgent {
     };
 }
 
-export function isOS(...os: UserAgent['os'][]): boolean {
+export function isOS (...os: UserAgent['os'][]): boolean {
     return os.includes(getUserAgent().os);
 }
 
-export function isBrowser(...browser: UserAgent['browser'][]): boolean {
+export function isBrowser (...browser: UserAgent['browser'][]): boolean {
     return browser.includes(getUserAgent().browser);
 }
 
@@ -255,7 +257,7 @@ export function isBrowser(...browser: UserAgent['browser'][]): boolean {
  * @param universalLink
  * @param deeplink
  */
-export function toDeeplink(universalLink: string, deeplink: string): string {
+export function toDeeplink (universalLink: string, deeplink: string): string {
     const url = new URL(universalLink);
     return deeplink + url.search;
 }
